@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rain World: Little Survivor</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111923;
+      color: white;
+      font-family: monospace;
+      text-align: center;
+    }
+    h1 { font-size: 22px; }
+    canvas {
+      width: min(95vw, 800px);
+      height: auto;
+      border: 3px solid #61756d;
+      background: #263a38;
+      image-rendering: pixelated;
+    }
+    p { color: #cbd8cf; }
+  </style>
+</head>
+<body>
+  <h1>Little Survivor</h1>
+  <canvas id="game" width="800" height="450"></canvas>
+  <p>Move with WASD or the arrow keys.</p>
+  <p>Explore the ruins. Find the little shelters. There is no objective.</p>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    const player = { x: 100, y: 330, speed: 3, size: 18 };
+    const keys = {};
+
+    const shelters = [
+      { x: 150, y: 240 },
+      { x: 400, y: 170 },
+      { x: 650, y: 300 }
+    ];
+
+    const platforms = [
+      { x: 0, y: 390, w: 800, h: 60 },
+      { x: 80, y: 280, w: 190, h: 12 },
+      { x: 340, y: 220, w: 160, h: 12 },
+      { x: 570, y: 340, w: 170, h: 12 }
+    ];
+
+    document.addEventListener("keydown", e => {
+      keys[e.key.toLowerCase()] = true;
+      if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+      }
+    });
+
+    document.addEventListener("keyup", e => {
+      keys[e.key.toLowerCase()] = false;
+    });
+
+    function draw() {
+      ctx.fillStyle = "#263a38";
+      ctx.fillRect(0, 0, 800, 450);
+
+      // Distant ruined buildings
+      ctx.fillStyle = "#354c47";
+      for (let i = 0; i < 8; i++) {
+        ctx.fillRect(i * 115, 100 + (i % 3) * 30, 65, 290);
+      }
+
+      // Platforms
+      for (const p of platforms) {
+        ctx.fillStyle = "#71857a";
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+        ctx.fillStyle = "#3b5047";
+        ctx.fillRect(p.x, p.y + p.h, p.w, 5);
+      }
+
+      // Shelters
+      for (const s of shelters) {
+        ctx.fillStyle = "#d4c69a";
+        ctx.fillRect(s.x, s.y, 34, 30);
+        ctx.fillStyle = "#192522";
+        ctx.fillRect(s.x + 8, s.y + 10, 18, 20);
+        ctx.fillStyle = "#f1dfaa";
+        ctx.fillRect(s.x + 13, s.y + 15, 8, 15);
+      }
+
+      // Little white survivor
+      ctx.fillStyle = "#e6e8d9";
+      ctx.fillRect(player.x, player.y, player.size, player.size);
+      ctx.fillRect(player.x - 5, player.y + 5, 5, 8);
+      ctx.fillRect(player.x + 6, player.y - 5, 6, 5);
+
+      // Eyes
+      ctx.fillStyle = "#1c2725";
+      ctx.fillRect(player.x + 4, player.y + 4, 3, 3);
+      ctx.fillRect(player.x + 12, player.y + 4, 3, 3);
+
+      // Ground details
+      ctx.fillStyle = "#8b9b84";
+      for (let x = 20; x < 800; x += 55) {
+        ctx.fillRect(x, 405, 3, 8);
+      }
+    }
+
+    function update() {
+      if (keys["arrowleft"] || keys["a"]) player.x -= player.speed;
+      if (keys["arrowright"] || keys["d"]) player.x += player.speed;
+      if (keys["arrowup"] || keys["w"]) player.y -= player.speed;
+      if (keys["arrowdown"] || keys["s"]) player.y += player.speed;
+
+      player.x = Math.max(0, Math.min(800 - player.size, player.x));
+      player.y = Math.max(0, Math.min(450 - player.size, player.y));
+
+      draw();
+      requestAnimationFrame(update);
+    }
+
+    update();
+  </script>
+</body>
+</html>
